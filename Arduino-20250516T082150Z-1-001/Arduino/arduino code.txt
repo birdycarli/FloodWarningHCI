@@ -1,0 +1,83 @@
+#include "dht.h"
+#define dht_apin A1
+
+const int analogInPin = A0;
+int sensorValue = 0;
+dht DHT;
+
+void setup() {
+  Serial.begin(9600);
+  // declare pin  to be an output:
+  pinMode(2,OUTPUT);
+  pinMode(3,OUTPUT);
+  pinMode(4,OUTPUT);
+  pinMode(5,OUTPUT);
+  pinMode(6,OUTPUT);
+  pinMode(7,OUTPUT);
+
+}
+
+// the loop routine runs over and over again forever:
+void loop() {
+
+  //water level 
+  int low = 20;
+  int medium = 40;
+  int high = 45;
+  int rainfallLimit = 350;
+  
+  //get value from sensor
+  sensorValue = analogRead(analogInPin);
+  Serial.print("Water level sensor = ");
+  Serial.print(sensorValue);
+  Serial.print("\n");
+
+  //reset led
+  digitalWrite(2,LOW);
+  digitalWrite(3,LOW);
+  digitalWrite(4,LOW);
+  digitalWrite(5,LOW);
+
+  if(sensorValue>low && sensorValue<medium){
+    digitalWrite(2,HIGH);
+    }
+  else if(sensorValue>medium && sensorValue<high){
+   digitalWrite(3,HIGH);
+    }  
+  else if(sensorValue>high){
+    digitalWrite(4,HIGH);
+    digitalWrite(5,HIGH);
+    }
+  else{
+    digitalWrite(2,LOW);
+    digitalWrite(3,LOW);
+    digitalWrite(4,LOW);
+    digitalWrite(5,LOW);
+    }
+
+    //temperature and humidity 
+    DHT.read11(dht_apin);
+    Serial.print("Current humidity = ");
+    Serial.print(DHT.humidity);
+    Serial.print("%  "); //Current humidity = 60%
+    Serial.print("temperature = ");
+    Serial.print(DHT.temperature); 
+    Serial.println("C  ");
+    delay(500); //500 miliseconds
+    
+
+    //rain sensor
+    int value = analogRead(A2);//read value
+    Serial.print("Rainfall Value : ");
+    Serial.println(value);
+    if (value < rainfallLimit) {//check condition
+      digitalWrite(6, HIGH);
+      Serial.print("Heavy rain,  LED on ");
+    } else {
+      digitalWrite(6, LOW);
+      Serial.print("No heavy rain");
+    }
+    delay(500);
+    Serial.println("\n");
+    
+}
